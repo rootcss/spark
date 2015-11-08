@@ -160,7 +160,7 @@ showDF(df)
 
 ## DataFrame Operations
 
-DataFrames provide a domain-specific language for structured data manipulation in [Scala](api/scala/index.html#org.apache.spark.sql.DataFrame), [Java](api/java/index.html?org/apache/spark/sql/DataFrame.html), and [Python](api/python/pyspark.sql.html#pyspark.sql.DataFrame).
+DataFrames provide a domain-specific language for structured data manipulation in [Scala](api/scala/index.html#org.apache.spark.sql.DataFrame), [Java](api/java/index.html?org/apache/spark/sql/DataFrame.html), [Python](api/python/pyspark.sql.html#pyspark.sql.DataFrame) and [R](api/R/DataFrame.html).
 
 Here we include some basic examples of structured data processing using DataFrames:
 
@@ -215,7 +215,7 @@ df.groupBy("age").count().show()
 
 For a complete list of the types of operations that can be performed on a DataFrame refer to the [API Documentation](api/scala/index.html#org.apache.spark.sql.DataFrame).
 
-In addition to simple column references and expressions, DataFrames also have a rich library of functions including string manipulation, date arithmetic, common math operations and more.  The complete list is available in the [DataFrame Function Reference](api/scala/index.html#org.apache.spark.sql.DataFrame).
+In addition to simple column references and expressions, DataFrames also have a rich library of functions including string manipulation, date arithmetic, common math operations and more.  The complete list is available in the [DataFrame Function Reference](api/scala/index.html#org.apache.spark.sql.functions$).
 
 
 </div>
@@ -882,6 +882,44 @@ saveDF(select(df, "name", "age"), "namesAndAges.parquet", "parquet")
 </div>
 </div>
 
+### Run SQL on files directly
+
+Instead of using read API to load a file into DataFrame and query it, you can also query that
+file directly with SQL.
+
+<div class="codetabs">
+<div data-lang="scala"  markdown="1">
+
+{% highlight scala %}
+val df = sqlContext.sql("SELECT * FROM parquet.`examples/src/main/resources/users.parquet`")
+{% endhighlight %}
+
+</div>
+
+<div data-lang="java"  markdown="1">
+
+{% highlight java %}
+DataFrame df = sqlContext.sql("SELECT * FROM parquet.`examples/src/main/resources/users.parquet`");
+{% endhighlight %}
+</div>
+
+<div data-lang="python"  markdown="1">
+
+{% highlight python %}
+df = sqlContext.sql("SELECT * FROM parquet.`examples/src/main/resources/users.parquet`")
+{% endhighlight %}
+
+</div>
+
+<div data-lang="r"  markdown="1">
+
+{% highlight r %}
+df <- sql(sqlContext, "SELECT * FROM parquet.`examples/src/main/resources/users.parquet`")
+{% endhighlight %}
+
+</div>
+</div>
+
 ### Save Modes
 
 Save operations can optionally take a `SaveMode`, that specifies how to handle existing data if
@@ -1047,15 +1085,6 @@ teenNames <- map(teenagers, function(p) { paste("Name:", p$name)})
 for (teenName in collect(teenNames)) {
   cat(teenName, "\n")
 }
-{% endhighlight %}
-
-</div>
-
-<div data-lang="python"  markdown="1">
-
-{% highlight python %}
-# sqlContext is an existing HiveContext
-sqlContext.sql("REFRESH TABLE my_table")
 {% endhighlight %}
 
 </div>
@@ -1585,7 +1614,7 @@ on all of the worker nodes, as they will need access to the Hive serialization a
 (SerDes) in order to access data stored in Hive.
 
 Configuration of Hive is done by placing your `hive-site.xml` file in `conf/`. Please note when running
-the query on a YARN cluster (`yarn-cluster` mode), the `datanucleus` jars under the `lib_managed/jars` directory
+the query on a YARN cluster (`cluster` mode), the `datanucleus` jars under the `lib_managed/jars` directory
 and `hive-site.xml` under `conf/` directory need to be available on the driver and all executors launched by the
 YARN cluster. The convenient way to do this is adding them through the `--jars` option and `--file` option of the
 `spark-submit` command.
